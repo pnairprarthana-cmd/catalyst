@@ -1,0 +1,240 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model University {
+  id          String   @id @default(uuid())
+  name        String
+  domain      String   @unique // e.g. "campus.edu", "iit.ac.in"
+  city        String
+  state       String
+  country     String   @default("US")
+  createdAt   DateTime @default(now())
+  users       User[]
+  pickupHubs  PickupLocation[]
+}
+
+model User {
+  id                     String             @id @default(uuid())
+  name                   String
+  email                  String             @unique
+  passwordHash           String?
+  universityId           String
+  university             University         @relation(fields: [universityId], references: [id])
+  course                 String
+  semester               Int                @default(1)
+  studentIdCard          String
+  role                   String             @default("student") // student, moderator, admin
+  isVerified             Boolean            @default(false)
+  avatarUrl              String?
+  greenScore             Int                @default(100)
+  trustScore             Int                @default(95)
+  returnPunctualityRate  Float              @default(100.0)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  listings               Listing[]
+  requests               Request[]
+  offers                 Offer[]
+  rentals                Rental[]
+  groupParticipations    RentalParticipant[]
+  ecoActions             EcoCreditTransaction[]
+  reviewsGiven           Review[]           @relation("ReviewsGiven")
+  reviewsReceived        Review[]           @relation("ReviewsReceived")
+  sentMessages           Message[]          @relation("SentMessages")
+  receivedMessages       Message[]          @relation("ReceivedMessages")
+  notifications          Notification[]
+  auditLogs              AdminAuditLog[]
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  listings    Listing[]
+  requests    Request[]
+}
+
+model Listing {
+  id               String       @id @default(uuid())
+  title            String
+  description      String
+  categoryId       String
+  category         Category     @relation(fields: [categoryId], references: [id])
+  sellerId         String
+  seller           User         @relation(fields: [sellerId], references: [id])
+  condition        String       // brand_new, like_new, good, fair
+  transactionType  String       // sell, rent, giveaway, exchange
+  price            Float        @default(0)
+  rentalRatePerDay Float?
+  rentalDeposit    Float?
+  status           String       @default("active") // active, reserved, rented, sold, completed
+  pickupLocationId String?
+  pickupLocation   PickupLocation? @relation(fields: [pickupLocationId], references: [id])
+  courseRelevant   String?
+  semesterRelevant Int?
+  co2SavedKg       Float        @default(4.5)
+  ecoCreditsAward  Int          @default(50)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  images           ListingImage[]
+  rentals          Rental[]
+  offers           Offer[]
+}
+
+model ListingImage {
+  id        String   @id @default(uuid())
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  url       String
+  isPrimary Boolean  @default(false)
+}
+
+model Request {
+  id               String       @id @default(uuid())
+  title            String
+  description      String
+  categoryId       String
+  category         Category     @relation(fields: [categoryId], references: [id])
+  studentId        String
+  student          User         @relation(fields: [studentId], references: [id])
+  neededByDate     DateTime
+  budget           Float
+  isRental         Boolean      @default(true)
+  rentalDaysNeeded Int          @default(1)
+  urgency          String       @default("medium") // urgent, high, medium, low
+  status           String       @default("open")   // open, fulfilled, expired
+  createdAt        DateTime     @default(now())
+  offers           Offer[]
+}
+
+model Offer {
+  id            String   @id @default(uuid())
+  requestId     String
+  request       Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  offererId     String
+  offerer       User     @relation(fields: [offererId], references: [id])
+  listingId     String?
+  listing       Listing? @relation(fields: [listingId], references: [id])
+  message       String
+  proposedPrice Float
+  isRental      Boolean  @default(true)
+  status        String   @default("pending") // pending, accepted, declined
+  createdAt     DateTime @default(now())
+}
+
+model Rental {
+  id                 String             @id @default(uuid())
+  listingId          String
+  listing            Listing            @relation(fields: [listingId], references: [id])
+  renterId           String
+  renter             User               @relation(fields: [renterId], references: [id])
+  startDate          DateTime
+  endDate            DateTime
+  totalDays          Int
+  dailyRate          Float
+  totalAmount        Float
+  depositAmount      Float
+  status             String             @default("confirmed") // pending_approval, confirmed, active, returned, overdue, cancelled
+  isGroupRental      Boolean            @default(false)
+  groupSlotsTotal    Int                @default(1)
+  pickupLocationId   String
+  pickupLocation     PickupLocation     @relation(fields: [pickupLocationId], references: [id])
+  qrHandoffCode      String             @unique
+  isHandoffVerified  Boolean            @default(false)
+  isReturnVerified   Boolean            @default(false)
+  paymentMethod      String             @default("upi") // upi, cash_handoff, demo_sandbox
+  paymentStatus      String             @default("escrow_held") // paid, escrow_held, pending_cash, refunded
+  createdAt          DateTime           @default(now())
+
+  participants       RentalParticipant[]
+}
+
+model RentalParticipant {
+  id          String   @id @default(uuid())
+  rentalId    String
+  rental      Rental   @relation(fields: [rentalId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  shareAmount Float
+  hasPaid     Boolean  @default(true)
+  joinedAt    DateTime @default(now())
+}
+
+model PickupLocation {
+  id                   String     @id @default(uuid())
+  universityId         String
+  university           University @relation(fields: [universityId], references: [id])
+  name                 String
+  zone                 String
+  landmark             String
+  operatingHours       String
+  securityStaffPresent Boolean    @default(true)
+  instructions         String
+  createdAt            DateTime   @default(now())
+
+  listings             Listing[]
+  rentals              Rental[]
+}
+
+model EcoCreditTransaction {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  actionTitle String
+  credits     Int
+  co2SavedKg  Float
+  category    String
+  createdAt   DateTime @default(now())
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  authorId    String
+  author      User     @relation("ReviewsGiven", fields: [authorId], references: [id])
+  targetId    String
+  target      User     @relation("ReviewsReceived", fields: [targetId], references: [id])
+  rating      Int      @default(5)
+  comment     String
+  punctuality Int      @default(5)
+  createdAt   DateTime @default(now())
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  senderId    String
+  sender      User     @relation("SentMessages", fields: [senderId], references: [id])
+  recipientId String
+  recipient   User     @relation("ReceivedMessages", fields: [recipientId], references: [id])
+  text        String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String   // offer, rental, eco_reward, system
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AdminAuditLog {
+  id        String   @id @default(uuid())
+  adminId   String
+  admin     User     @relation(fields: [adminId], references: [id])
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}
