@@ -91,11 +91,11 @@ export default function GroupRentalsView({ onOpenListing }: { onOpenListing: (li
                 <div className="rounded-xl bg-purple-950/30 p-3 border border-purple-500/20 text-xs space-y-1.5 mb-4">
                   <div className="flex justify-between text-slate-300">
                     <span>Total Booking Cost:</span>
-                    <span className="font-bold text-white">${booking.totalAmount}</span>
+                    <span className="font-bold text-white">₹{booking.totalAmount}</span>
                   </div>
                   <div className="flex justify-between text-purple-300 font-bold border-t border-white/10 pt-1">
                     <span>Your Split Share:</span>
-                    <span className="text-sm text-cyan-300">${perStudentShare} / student</span>
+                    <span className="text-sm text-cyan-300">₹{perStudentShare} / student</span>
                   </div>
                 </div>
 
@@ -150,7 +150,7 @@ export default function GroupRentalsView({ onOpenListing }: { onOpenListing: (li
                     className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 py-2.5 text-xs font-bold text-white shadow-lg shadow-purple-500/20 hover:from-purple-500 hover:to-cyan-400 transition-all cursor-pointer flex items-center justify-center gap-2"
                   >
                     <PlusCircle className="h-4 w-4" />
-                    <span>Join Shared Booking (${perStudentShare})</span>
+                    <span>Join Shared Booking (₹{perStudentShare})</span>
                   </button>
                 ) : (
                   <div className="text-center text-xs text-slate-500 py-2">

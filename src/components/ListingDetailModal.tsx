@@ -160,8 +160,8 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
             {/* Left: Image + Seller */}
             <div className="p-5 space-y-4 border-b sm:border-b-0 sm:border-r border-slate-100">
               {/* Image */}
-              <div className="aspect-[4/3] overflow-hidden rounded-xl bg-slate-100">
-                <img src={listing.images[0]} alt={listing.title} className="h-full w-full object-cover" />
+              <div className="h-[240px] overflow-hidden rounded-xl bg-[#f7f7f7] border border-slate-100 flex items-center justify-center p-4">
+                <img src={listing.images[0]} alt={listing.title} className="max-h-full max-w-full object-contain mx-auto" />
               </div>
 
               {/* Price */}
@@ -171,7 +171,7 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
                     {isBorrow ? "Peer Loan" : isRent ? "Daily Rate" : isGiveaway ? "Donation" : "Purchase Price"}
                   </p>
                   <p className="text-2xl font-extrabold text-slate-900">
-                    {isBorrow ? <span className="text-teal-600">Free ($0)</span> : isRent ? <span>${listing.rentalRatePerDay}<span className="text-sm font-normal text-slate-400">/day</span></span> : isGiveaway ? <span className="text-teal-600">Free</span> : <span>${listing.price}</span>}
+                    {isBorrow ? <span className="text-teal-600">Free (₹0)</span> : isRent ? <span>₹{listing.rentalRatePerDay}<span className="text-sm font-normal text-slate-400">/day</span></span> : isGiveaway ? <span className="text-teal-600">Free</span> : <span>₹{listing.price}</span>}
                   </p>
                 </div>
                 <div className="text-right">
@@ -260,7 +260,7 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
                   </div>
                   {bookingError && <p className="text-xs text-red-500 bg-red-50 rounded-lg p-2">{bookingError}</p>}
                   <button onClick={handleConfirmBorrow} className="w-full ce-btn-primary justify-center py-2.5">
-                    Confirm Borrow — $0 Free
+                    Confirm Borrow — ₹0 Free
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -293,11 +293,11 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
                   </div>
 
                   <div className="rounded-lg bg-slate-50 border border-slate-200 p-3 text-[12px] space-y-1">
-                    <div className="flex justify-between"><span className="text-slate-500">Rental ({rentalDays}d × ${dailyRate})</span><span className="font-semibold">${subtotal}</span></div>
-                    <div className="flex justify-between"><span className="text-slate-500">Refundable deposit</span><span className="font-semibold">${deposit}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">Rental ({rentalDays}d × ₹{dailyRate})</span><span className="font-semibold">₹{subtotal}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">Refundable deposit</span><span className="font-semibold">₹{deposit}</span></div>
                     <div className="ce-divider" />
-                    <div className="flex justify-between font-bold text-slate-900"><span>Total due</span><span className="text-teal-700">${totalDue}</span></div>
-                    {isGroupRental && <div className="flex justify-between text-teal-600 font-bold"><span>Your share ({groupSlots} students)</span><span>${splitShare}</span></div>}
+                    <div className="flex justify-between font-bold text-slate-900"><span>Total due</span><span className="text-teal-700">₹{totalDue}</span></div>
+                    {isGroupRental && <div className="flex justify-between text-teal-600 font-bold"><span>Your share ({groupSlots} students)</span><span>₹{splitShare}</span></div>}
                   </div>
 
                   <div>
@@ -316,7 +316,7 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
                   {bookingError && <p className="text-xs text-red-500 bg-red-50 rounded-lg p-2">{bookingError}</p>}
 
                   <button onClick={handleBookRental} disabled={!isAvailable} className={`w-full ce-btn-primary justify-center py-2.5 ${!isAvailable ? "opacity-50 cursor-not-allowed" : ""}`}>
-                    Reserve Now — ${isGroupRental ? splitShare : totalDue}
+                    Reserve Now — ₹{isGroupRental ? splitShare : totalDue}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
@@ -337,8 +337,11 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
               {isSell && (
                 <div className="rounded-xl border border-slate-200 p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-slate-800">Purchase Item</span>
-                    <span className="text-xl font-extrabold text-slate-900">${listing.price}</span>
+                    <span className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                      <span>Campus Store Purchase</span>
+                      <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded">Store</span>
+                    </span>
+                    <span className="text-xl font-extrabold text-slate-900">₹{listing.price}</span>
                   </div>
                   <div>
                     <label className="block text-[11px] font-bold text-slate-500 mb-1">Payment Method</label>
@@ -355,7 +358,7 @@ export default function ListingDetailModal({ listing, onClose, onOpenChat }: Lis
                     onClick={() => setBookingSuccess({ id: `buy-${Date.now()}`, status: "confirmed", qrHandoffCode: `CX-BUY-${Math.floor(1000 + Math.random() * 9000)}` })}
                     className="w-full ce-btn-primary justify-center py-2.5"
                   >
-                    Buy Now — ${listing.price}
+                    Buy from Store — ₹{listing.price}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>

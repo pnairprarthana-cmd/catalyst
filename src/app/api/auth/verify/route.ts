@@ -7,7 +7,6 @@ const APPROVED_DOMAINS = [
   "berkeley.edu",
   "iit.ac.in",
   "bits-pilani.ac.in",
-  "apex.edu",
 ];
 
 export async function POST(request: Request) {
@@ -48,7 +47,7 @@ export async function POST(request: Request) {
       verified: true,
       message: "Student institutional email and campus credentials verified successfully.",
       domain,
-      studentIdCard: studentIdCard || "APX-VERIFIED",
+      studentIdCard: studentIdCard || "CAMPUS-VERIFIED",
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

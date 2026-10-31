@@ -12,6 +12,7 @@ import {
   EcoCreditAction,
   AcademicDocument,
   ExchangeProposal,
+  EarningsTransaction,
 } from "@/types";
 import {
   SAMPLE_USERS,
@@ -23,8 +24,17 @@ import {
   CATEGORIES,
   ACADEMIC_DOCUMENTS,
   SAMPLE_EXCHANGES,
+  SAMPLE_EARNINGS,
 } from "@/lib/mockData";
 
+
+export interface CartItem {
+  id: string;
+  listing: Listing;
+  rentalDays: number;
+  pickupHubId: string;
+  addedAt: string;
+}
 
 export interface ChatMessage {
   id: string;
@@ -85,6 +95,15 @@ interface CampusContextType {
   savedListingIds: string[];
   toggleSaveListing: (listingId: string) => void;
 
+  // Shopping Cart
+  cartItems: CartItem[];
+  addToCart: (listing: Listing, options?: { rentalDays?: number; pickupHubId?: string }) => void;
+  removeFromCart: (cartItemId: string) => void;
+  updateCartItemDays: (cartItemId: string, days: number) => void;
+  clearCart: () => void;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
+
   // Authentication & Verification
   isAuthModalOpen: boolean;
   authModalMode: "login" | "register" | "verify" | "forgot";
@@ -108,6 +127,13 @@ interface CampusContextType {
   openReportModal: (type: "listing" | "user", id: string, title: string) => void;
   closeReportModal: () => void;
   submitReport: (reason: string, details?: string) => void;
+
+  // Earnings & Wallet
+  earningsTransactions: EarningsTransaction[];
+  totalEarnings: number;
+  availableEarnings: number;
+  pendingEscrowEarnings: number;
+  withdrawEarnings: (amount: number, upiId: string) => { success: boolean; message: string; transaction?: EarningsTransaction };
 
   // Actions
   addListing: (listingData: Partial<Listing>) => Listing;
@@ -169,9 +195,16 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
   // Wishlist State
   const [savedListingIds, setSavedListingIds] = useState<string[]>(["list-borrow-1", "list-4"]);
 
+  // Cart State
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+
   // Authentication & Verification State
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [authModalMode, setAuthModalMode] = useState<"login" | "register" | "verify" | "forgot">("login");
+
+  // Earnings & Wallet State
+  const [earningsTransactions, setEarningsTransactions] = useState<EarningsTransaction[]>(SAMPLE_EARNINGS);
 
   // Safety & Reporting Modal State
   const [reportModalData, setReportModalData] = useState<{
@@ -420,7 +453,7 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
       {
         id: `notif-${Date.now()}`,
         title: "Offer Submitted! 🤝",
-        message: `You offered $${offerData.proposedPrice} on the campus request.`,
+        message: `You offered ₹${offerData.proposedPrice} on the campus request.`,
         type: "offer",
         timestamp: "Just now",
         isRead: false,
@@ -801,6 +834,49 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
     return true;
   };
 
+  // Cart Handlers
+  const addToCart = (listing: Listing, options?: { rentalDays?: number; pickupHubId?: string }) => {
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.listing.id === listing.id);
+      if (existing) {
+        return prev.map((item) =>
+          item.listing.id === listing.id
+            ? {
+                ...item,
+                rentalDays: options?.rentalDays || item.rentalDays,
+                pickupHubId: options?.pickupHubId || item.pickupHubId,
+              }
+            : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: `cart-${Date.now()}`,
+          listing,
+          rentalDays: options?.rentalDays || listing.maxBorrowDays || 2,
+          pickupHubId: options?.pickupHubId || listing.pickupLocationId || "hub-1",
+          addedAt: new Date().toISOString(),
+        },
+      ];
+    });
+    setIsCartOpen(true);
+  };
+
+  const removeFromCart = (cartItemId: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== cartItemId));
+  };
+
+  const updateCartItemDays = (cartItemId: string, days: number) => {
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === cartItemId ? { ...item, rentalDays: Math.max(1, days) } : item))
+    );
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   const sendChatMessage = (recipientId: string, listingId: string | undefined, text: string) => {
     const newMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
@@ -1133,11 +1209,11 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
         id: `user-${Date.now()}`,
         name: email.split("@")[0].replace(".", " "),
         email,
-        college: "Apex University of Technology",
+        college: "Indian Institute of Technology (IIT) Bombay",
         domain,
         course: "B.Tech Computer Science",
         semester: 4,
-        studentId: "APX-VERIFIED",
+        studentId: "CAMPUS-VERIFIED",
         role: "student",
         isVerified: true,
         avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&q=80",
@@ -1224,6 +1300,51 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
     closeReportModal();
   };
 
+  // Earnings calculations for active user
+  const userEarningsTxns = earningsTransactions.filter((t) => t.userId === currentUser.id);
+  const totalEarnings = userEarningsTxns
+    .filter((t) => t.type !== "withdrawal")
+    .reduce((sum, t) => sum + t.amount, 0);
+  const totalWithdrawn = userEarningsTxns
+    .filter((t) => t.type === "withdrawal")
+    .reduce((sum, t) => sum + t.amount, 0);
+  const pendingEscrowEarnings = userEarningsTxns
+    .filter((t) => t.status === "pending_escrow")
+    .reduce((sum, t) => sum + t.amount, 0);
+  const availableEarnings = Math.max(0, totalEarnings - pendingEscrowEarnings - totalWithdrawn);
+
+  const withdrawEarnings = (amount: number, upiId: string) => {
+    if (amount <= 0 || amount > availableEarnings) {
+      return { success: false, message: `Invalid amount. Your available balance is ₹${availableEarnings}.` };
+    }
+    const cleanUpi = upiId.trim() || `${currentUser.email.split("@")[0]}@oksbi`;
+    const newTxn: EarningsTransaction = {
+      id: `earn-${Date.now()}`,
+      userId: currentUser.id,
+      title: `Instant UPI Payout to ${cleanUpi}`,
+      type: "withdrawal",
+      amount,
+      date: "Just now",
+      status: "withdrawn",
+      paymentMethod: "UPI Instant",
+      referenceCode: `PAYOUT-UPI-${Math.floor(10000 + Math.random() * 90000)}`,
+    };
+    setEarningsTransactions((prev) => [newTxn, ...prev]);
+    setNotifications((prev) => [
+      {
+        id: `notif-${Date.now()}`,
+        title: "UPI Transfer Sent! 💸",
+        message: `₹${amount} was successfully sent to ${cleanUpi}. Ref: ${newTxn.referenceCode}.`,
+        type: "system",
+        timestamp: "Just now",
+        isRead: false,
+        linkTab: "earnings",
+      },
+      ...prev,
+    ]);
+    return { success: true, message: `Successfully transferred ₹${amount} to ${cleanUpi}!`, transaction: newTxn };
+  };
+
   return (
     <CampusContext.Provider
       value={{
@@ -1258,6 +1379,13 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
         declineExchangeProposal,
         savedListingIds,
         toggleSaveListing,
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateCartItemDays,
+        clearCart,
+        isCartOpen,
+        setIsCartOpen,
         isAuthModalOpen,
         authModalMode,
         openAuthModal,
@@ -1271,6 +1399,11 @@ export function CampusProvider({ children }: { children: React.ReactNode }) {
         openReportModal,
         closeReportModal,
         submitReport,
+        earningsTransactions,
+        totalEarnings,
+        availableEarnings,
+        pendingEscrowEarnings,
+        withdrawEarnings,
         addListing,
         createRequest,
         submitOffer,

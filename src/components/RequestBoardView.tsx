@@ -217,9 +217,9 @@ export default function RequestBoardView() {
                   </div>
 
                   <div className="flex items-center gap-1 rounded-lg bg-white/5 px-2.5 py-1 text-slate-300">
-                    <DollarSign className="h-3 w-3 text-emerald-400" />
+                    <span className="text-xs font-bold text-emerald-400">₹</span>
                     <span>
-                      Budget: ${req.budget} {req.isRental ? `(Rent ${req.rentalDaysNeeded}d)` : "(Buy)"}
+                      Budget: ₹{req.budget} {req.isRental ? `(Rent ${req.rentalDaysNeeded}d)` : "(Buy)"}
                     </span>
                   </div>
                 </div>
@@ -431,13 +431,13 @@ export default function RequestBoardView() {
                     {selectedRequestForOffer.title}
                   </h3>
                   <div className="text-[11px] text-slate-400 mt-1">
-                    Requested by {selectedRequestForOffer.student.name} • Budget: ${selectedRequestForOffer.budget}
+                    Requested by {selectedRequestForOffer.student.name} • Budget: ₹{selectedRequestForOffer.budget}
                   </div>
                 </div>
 
                 <div>
                   <label className="text-[10px] font-bold uppercase text-slate-400 mb-1 block">
-                    Your Proposed Price / Rental Fee ($)
+                    Your Proposed Price / Rental Fee (₹)
                   </label>
                   <input
                     type="number"
@@ -462,7 +462,7 @@ export default function RequestBoardView() {
                       .filter((l) => l.seller.id === currentUser.id)
                       .map((l) => (
                         <option key={l.id} value={l.id}>
-                          {l.title} (${l.price})
+                          {l.title} (₹{l.price})
                         </option>
                       ))}
                   </select>

@@ -175,10 +175,10 @@ export default function RentalManagementView() {
                     <div className="text-left lg:text-right">
                       <div className="text-[10px] uppercase text-slate-400 font-semibold">Total Amount</div>
                       <div className="text-base font-extrabold text-cyan-400">
-                        ${booking.totalAmount}
+                        ₹{booking.totalAmount}
                         {booking.depositAmount > 0 && (
                           <span className="text-xs text-slate-400 font-normal ml-1">
-                            (+${booking.depositAmount} dep)
+                            (+₹{booking.depositAmount} dep)
                           </span>
                         )}
                       </div>
@@ -223,7 +223,7 @@ export default function RentalManagementView() {
                   <div className="mt-3 rounded-xl bg-black/30 p-2.5 border border-white/5 text-xs">
                     <div className="flex items-center justify-between text-[11px] font-bold text-purple-300 mb-1.5">
                       <span>Group Split Co-Renters ({booking.participants.length} joined)</span>
-                      <span>${booking.participants[0]?.shareAmount} per student</span>
+                      <span>₹{booking.participants[0]?.shareAmount} per student</span>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {booking.participants.map((p) => (

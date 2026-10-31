@@ -17,6 +17,8 @@ import GreenScoreView from "@/components/GreenScoreView";
 import CommunityEventsView from "@/components/CommunityEventsView";
 import CampusTrustPassportView from "@/components/CampusTrustPassportView";
 import AdminDashboardView from "@/components/AdminDashboardView";
+import StudentEarningsView from "@/components/StudentEarningsView";
+import KarmaGuidelinesView from "@/components/KarmaGuidelinesView";
 import ChatDrawer from "@/components/ChatDrawer";
 import { CATEGORIES, CAMPUS_STATS, TESTIMONIALS, CAMPUS_PULSE_ITEMS } from "@/lib/mockData";
 import { Listing } from "@/types";
@@ -28,6 +30,7 @@ import {
   ShoppingBag,
   Search,
   TrendingUp,
+  Wallet,
   SlidersHorizontal,
   ChevronDown,
   Repeat2,
@@ -48,9 +51,9 @@ import {
 // ── Filter tabs definition ───────────────────────────────────────────────────
 const FILTER_TABS = [
   { id: "all", label: "All Items" },
-  { id: "borrow", label: "Free to Borrow ($0)" },
+  { id: "sell", label: "Campus Store (Buy)" },
+  { id: "borrow", label: "Free to Borrow (₹0)" },
   { id: "rent", label: "Rentals" },
-  { id: "sell", label: "Buy & Sell" },
   { id: "exchange", label: "Smart Exchange" },
   { id: "giveaway", label: "Giveaways" },
 ];
@@ -63,6 +66,20 @@ const SORT_OPTIONS = [
   { value: "eco", label: "Most Eco-Friendly" },
 ];
 
+const CAT_EMOJIS: Record<string, string> = {
+  "cat-1": "📚",
+  "cat-2": "📖",
+  "cat-3": "🔬",
+  "cat-4": "💻",
+  "cat-5": "👔",
+  "cat-10": "✏️",
+  "cat-11": "🧶",
+  "cat-6": "🏸",
+  "cat-7": "🏠",
+  "cat-8": "🔧",
+  "cat-9": "🎁",
+};
+
 // ── Home View: landing + featured sections ────────────────────────────────────
 function HomeView({
   onSelectListing,
@@ -73,148 +90,182 @@ function HomeView({
   onOpenChat: (s: string, l?: string) => void;
   onOpenAddModal: () => void;
 }) {
-  const { listings, requests, currentUser, setActiveTab, setTransactionFilter, setSelectedCategory } = useCampus();
+  const { listings, requests, currentUser, setActiveTab, setTransactionFilter, setSelectedCategory, totalEarnings } = useCampus();
 
   const freeBorrows = listings.filter((l) => l.transactionType === "borrow").slice(0, 4);
+  const studentCrafts = listings.filter((l) => l.categoryId === "cat-11").slice(0, 4);
   const trending = listings.filter((l) => l.isFeatured || l.views > 100).slice(0, 8);
   const recommended = listings
     .filter((l) => l.courseRelevant || l.semesterRelevant === currentUser.semester)
     .slice(0, 4);
 
   return (
-    <div className="space-y-10 pb-10">
-      {/* ── Hero / Welcome strip ── */}
-      <div className="rounded-2xl border border-slate-200 bg-gradient-to-r from-teal-50 via-white to-emerald-50 p-6 sm:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          <div className="flex-1">
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-[11px] font-bold text-teal-700 mb-3">
-              <BadgeCheck className="h-3.5 w-3.5" />
-              Student-only verified platform
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Your Campus Has Everything<br className="hidden sm:block" />
-              <span className="text-teal-600"> You Need. Just Exchange It.</span>
-            </h1>
-            <p className="mt-2 text-sm text-slate-500 max-w-md leading-relaxed">
-              Save money by renting, borrowing and exchanging with verified students on your campus. Over {CAMPUS_STATS.totalItemsReused.toLocaleString()} items shared, {CAMPUS_STATS.studentMoneySaved} saved.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2.5">
-              <button
-                onClick={() => { setTransactionFilter("borrow"); setActiveTab("explore"); }}
-                className="ce-btn-primary text-sm"
-              >
-                <HandHelping className="h-4 w-4" />
-                Browse Free Borrows
-              </button>
-              <button
-                onClick={() => { setTransactionFilter("all"); setActiveTab("explore"); }}
-                className="ce-btn-outline text-sm"
-              >
-                <ShoppingBag className="h-4 w-4" />
-                Explore Marketplace
-              </button>
-            </div>
+    <div className="space-y-12 sm:space-y-14 pb-14">
+      {/* ── Main Hero Section (Reference Layout Structure) ── */}
+      <div className="relative overflow-hidden rounded-3xl border border-pink-200/80 bg-gradient-to-r from-[#FFFBEB] via-[#FEF9C3]/65 to-[#FCE7F3] shadow-sm">
+        {/* Background Image: Campus architectural photo blended seamlessly on the right half */}
+        <div className="absolute right-0 top-0 bottom-0 w-full lg:w-1/2 pointer-events-none overflow-hidden select-none">
+          <img
+            src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1600&q=80"
+            alt="Campus Architecture & Life"
+            className="h-full w-full object-cover object-center opacity-30 lg:opacity-40 mix-blend-multiply"
+          />
+          {/* Subtle fade masks melting into the left butter yellow / pink gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#FFFBEB] via-[#FFFBEB]/75 to-transparent hidden lg:block" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#FDF2F8]/90 via-[#FDF2F8]/40 to-transparent lg:hidden" />
+        </div>
+
+        {/* Hero Content — Left Aligned */}
+        <div className="relative z-10 px-6 sm:px-10 lg:px-12 pt-8 sm:pt-12 pb-8 max-w-2xl space-y-6">
+          {/* College Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-pink-200/90 bg-white/90 px-3.5 py-1 text-xs font-bold text-[#BE185D] shadow-2xs backdrop-blur-xs">
+            <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
+            <span>Verified Student-Only Community Platform</span>
           </div>
-          {/* Stats cluster */}
-          <div className="flex gap-4 sm:gap-6 shrink-0">
+
+          {/* Left-Aligned Headline */}
+          <div className="space-y-1">
+            <h1 className="font-display text-3xl sm:text-5xl lg:text-5xl font-black tracking-tight leading-[1.12]">
+              <span className="block text-[#1E293B]">
+                Empowering Students to
+              </span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#E11D48] via-[#DB2777] to-[#BE185D] mt-1">
+                Connect, Create & Exchange
+              </span>
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <p className="text-[#475569] text-sm sm:text-base max-w-[480px] leading-relaxed font-normal">
+            A verified student community platform to borrow, exchange, and share resources sustainably on campus.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap items-center gap-3 pt-1">
+            {/* Primary button */}
+            <button
+              onClick={() => { setTransactionFilter("all"); setActiveTab("explore"); }}
+              className="bg-amber-300 hover:bg-amber-400 text-slate-900 font-semibold rounded-full px-6 py-2.5 shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-98"
+            >
+              <span>Explore Campus Store</span>
+              <ChevronRight className="h-4 w-4" />
+            </button>
+
+            {/* My Earnings & Wallet quick button */}
+            <button
+              onClick={() => setActiveTab("earnings")}
+              className="border border-amber-300 bg-amber-50/90 hover:bg-amber-100/90 text-amber-900 rounded-full px-5 py-2.5 font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-2xs active:scale-98"
+            >
+              <Wallet className="h-4 w-4 text-amber-700" />
+              <span>My Earnings (₹{totalEarnings.toLocaleString("en-IN")})</span>
+            </button>
+
+            {/* Secondary button */}
+            <button
+              onClick={() => { setTransactionFilter("borrow"); setActiveTab("explore"); }}
+              className="border border-pink-300 bg-pink-100/60 hover:bg-pink-200/70 text-pink-900 rounded-full px-6 py-2.5 font-medium transition-all flex items-center gap-2 cursor-pointer shadow-2xs active:scale-98"
+            >
+              <HandHelping className="h-4 w-4 text-pink-700" />
+              <span>How It Works</span>
+            </button>
+          </div>
+
+          {/* Horizontal Key Stats Cards Row directly below buttons */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3">
             {[
-              { value: `${CAMPUS_STATS.activeStudents}`, label: "Verified Students", icon: Users, color: "text-teal-600" },
-              { value: `${CAMPUS_STATS.co2AvoidedKg} kg`, label: "CO₂ Avoided", icon: Leaf, color: "text-emerald-600" },
+              { number: "2000+", label: "Active Students" },
+              { number: "400+", label: "Items Shared" },
+              { number: "100+", label: "Daily Trades" },
+              { number: "₹50k+", label: "Money Saved" },
             ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <stat.icon className={`h-5 w-5 ${stat.color} mx-auto mb-1`} />
-                <p className="text-xl font-extrabold text-slate-900">{stat.value}</p>
-                <p className="text-[10px] text-slate-500 font-medium max-w-[80px] leading-tight">{stat.label}</p>
+              <div
+                key={stat.label}
+                className="bg-white/80 backdrop-blur-md border border-pink-200/60 rounded-xl p-4 text-center min-w-[110px] shadow-sm hover:border-pink-300 transition-colors"
+              >
+                <p className="text-slate-900 font-bold text-xl leading-tight font-display">{stat.number}</p>
+                <p className="text-slate-600 text-xs font-medium mt-1 leading-tight">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      {/* ── How it works ── */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="ce-section-title">How CampusExchange Works</h2>
-            <p className="ce-section-sub">Three simple steps. Zero confusion.</p>
+        {/* Bottom Marquee / Continuous Ticker Bar */}
+        <div className="relative z-10 border-t border-pink-200/70 bg-white/75 backdrop-blur-md py-2.5 px-4 overflow-hidden">
+          <div className="animate-marquee whitespace-nowrap text-xs font-semibold text-slate-700 flex items-center gap-8">
+            <span className="flex items-center gap-1.5 text-amber-900 font-bold">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              ⚡ Zero Waste Campus Initiative
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-pink-700 font-bold">
+              🤝 Free Peer Borrowing Desk (₹0)
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-slate-800">
+              🎓 Verified Student-Only ID (.edu & .ac.in)
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-emerald-700 font-bold">
+              🌿 Over 8,900 kg CO₂ Avoided
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-slate-800">
+              📦 3 Safe Pickup Hubs Active Across Campus
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-amber-900 font-medium">
+              📚 Textbooks, Lab Coats, Calculators & Gear
+            </span>
+            <span className="text-slate-300">•</span>
+            {/* Repeated for seamless continuous loop */}
+            <span className="flex items-center gap-1.5 text-amber-900 font-bold">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              ⚡ Zero Waste Campus Initiative
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-pink-700 font-bold">
+              🤝 Free Peer Borrowing Desk (₹0)
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-slate-800">
+              🎓 Verified Student-Only ID (.edu & .ac.in)
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-emerald-700 font-bold">
+              🌿 Over 8,900 kg CO₂ Avoided
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-slate-800">
+              📦 3 Safe Pickup Hubs Active Across Campus
+            </span>
+            <span className="text-slate-300">•</span>
+            <span className="flex items-center gap-1.5 text-amber-900 font-medium">
+              📚 Textbooks, Lab Coats, Calculators & Gear
+            </span>
           </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            {
-              step: "1",
-              icon: BadgeCheck,
-              title: "Verify",
-              desc: "Sign up with your college email (.edu or .ac.in). Campus trust passport created instantly.",
-              color: "bg-teal-50 text-teal-600 border-teal-100",
-            },
-            {
-              step: "2",
-              icon: Search,
-              title: "Discover",
-              desc: "Browse 9 categories of campus items. Filter by Free Borrows, Rentals, Buy & Sell, or Exchange.",
-              color: "bg-blue-50 text-blue-600 border-blue-100",
-            },
-            {
-              step: "3",
-              icon: Repeat2,
-              title: "Exchange",
-              desc: "Book, borrow or swap at a campus safe pickup hub. Earn Eco-Credits for every sustainable action.",
-              color: "bg-emerald-50 text-emerald-600 border-emerald-100",
-            },
-          ].map((s) => (
-            <div key={s.step} className="rounded-xl border border-slate-200 bg-white p-5 flex gap-4">
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border ${s.color}`}>
-                <s.icon className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-0.5">Step {s.step}</p>
-                <h3 className="text-base font-bold text-slate-900 mb-1">{s.title}</h3>
-                <p className="text-[12px] text-slate-500 leading-relaxed">{s.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Campus Pulse ── */}
-      <div className="rounded-xl border border-slate-200 bg-white p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <Activity className="h-4 w-4 text-teal-600" />
-          <h2 className="text-sm font-bold text-slate-900">Campus Pulse</h2>
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Live
-          </span>
-        </div>
-        <div className="space-y-2">
-          {CAMPUS_PULSE_ITEMS.map((item) => (
-            <div key={item.id} className="flex items-start gap-3 text-[12px]">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-teal-100 text-teal-600 shrink-0 mt-0.5">
-                <Zap className="h-2.5 w-2.5" />
-              </span>
-              <span className="text-slate-600 flex-1">{item.text}</span>
-              <span className="text-slate-400 shrink-0">{item.time}</span>
-            </div>
-          ))}
         </div>
       </div>
 
       {/* ── Free Borrows section ── */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <h2 className="ce-section-title flex items-center gap-2">
-              <HandHelping className="h-5 w-5 text-emerald-600" />
-              Free Campus Borrows
+            <h2 className="ce-section-title flex items-center gap-2 font-display text-xl sm:text-2xl font-black">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-yellow-200/80 text-amber-900 text-sm">
+                🤝
+              </span>
+              <span>Free Campus Borrows</span>
+              <span className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                ₹0 Fee
+              </span>
             </h2>
-            <p className="ce-section-sub">Borrow for free from verified peers. Return when done — no cost.</p>
+            <p className="ce-section-sub mt-0.5">Borrow for free from verified students. Return when done — no cost.</p>
           </div>
           <button
             onClick={() => { setTransactionFilter("borrow"); setActiveTab("explore"); }}
-            className="flex items-center gap-1 text-[12px] font-semibold text-teal-600 hover:text-teal-800 transition-colors"
+            className="flex items-center gap-1 text-xs sm:text-sm font-bold text-pink-600 hover:text-pink-800 transition-colors"
           >
-            View all <ChevronRight className="h-4 w-4" />
+            View all borrows <ChevronRight className="h-4 w-4" />
           </button>
         </div>
         <div className="marketplace-grid">
@@ -254,7 +305,7 @@ function HomeView({
                 className="flex h-10 w-10 items-center justify-center rounded-xl text-lg"
                 style={{ background: cat.color + "20" }}
               >
-                {["📚","📖","🔬","💻","👘","🏸","🏠","🔧","🎁"][CATEGORIES.indexOf(cat)] || "📦"}
+                {CAT_EMOJIS[cat.id] || "📦"}
               </div>
               <div>
                 <p className="text-[11px] font-bold text-slate-800 leading-tight line-clamp-2">{cat.name.split(" & ")[0]}</p>
@@ -293,6 +344,40 @@ function HomeView({
           ))}
         </div>
       </div>
+
+      {/* ── Student Made: Handmade Crochet & Hampers ── */}
+      {studentCrafts.length > 0 && (
+        <div className="rounded-2xl border border-pink-200/80 bg-gradient-to-r from-[#FFFBEB] via-[#FFF5F7] to-[#FCE7F3] p-5 sm:p-6 shadow-xs">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 text-[11px] font-bold mb-1">
+                <Sparkles className="h-3 w-3" />
+                Student Creators & Artisans
+              </div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
+                Handmade Crochet, Hampers & Crafts
+              </h2>
+              <p className="text-xs text-slate-500">Handcrafted by hostel peers for sale on campus</p>
+            </div>
+            <button
+              onClick={() => { setSelectedCategory("cat-11"); setActiveTab("explore"); }}
+              className="flex items-center gap-1 text-[12px] font-semibold text-pink-600 hover:text-pink-800 transition-colors"
+            >
+              Explore all crafts <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="marketplace-grid">
+            {studentCrafts.map((item) => (
+              <ProductCard
+                key={item.id}
+                listing={item}
+                onSelect={onSelectListing}
+                onOpenChat={(s, l) => onOpenChat(s, l)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Recommended ── */}
       {recommended.length > 0 && (
@@ -386,10 +471,10 @@ function HomeView({
       </div>
 
       {/* ── Join CTA ── */}
-      <div className="rounded-2xl border border-teal-200 bg-teal-50 p-6 sm:p-8 text-center">
+      <div className="rounded-2xl border border-pink-200/80 bg-gradient-to-br from-[#fdf2f8] via-[#fff5f7] to-[#fef9c3] p-6 sm:p-8 text-center shadow-xs">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Shield className="h-5 w-5 text-teal-600" />
-          <span className="text-sm font-semibold text-teal-700">100% Student-Verified Community</span>
+          <Shield className="h-5 w-5 text-pink-600" />
+          <span className="text-sm font-bold text-pink-900">100% Student-Verified Community</span>
         </div>
         <h2 className="text-2xl font-extrabold text-slate-900 mb-2">
           Join the CampusExchange Community
@@ -474,9 +559,9 @@ function ExploreView({
     <div className="space-y-5">
       {/* Page header */}
       <div>
-        <h1 className="text-xl font-extrabold text-slate-900">Campus Marketplace</h1>
+        <h1 className="text-xl font-extrabold text-slate-900">Campus Store & Resource Hub</h1>
         <p className="text-sm text-slate-500">
-          Borrow, rent, buy or exchange resources safely within your verified campus community
+          Shop verified campus store items, borrow for free, rent gear, or exchange with peers
         </p>
       </div>
 
@@ -636,6 +721,8 @@ function CampusExchangeApp() {
           {activeTab === "greenscore" && <GreenScoreView />}
           {activeTab === "events" && <CommunityEventsView />}
           {activeTab === "passport" && <CampusTrustPassportView />}
+          {activeTab === "earnings" && <StudentEarningsView />}
+          {activeTab === "karma-guidelines" && <KarmaGuidelinesView />}
           {activeTab === "admin" && <AdminDashboardView />}
         </main>
       </div>
@@ -661,9 +748,5 @@ function CampusExchangeApp() {
 }
 
 export default function Home() {
-  return (
-    <CampusProvider>
-      <CampusExchangeApp />
-    </CampusProvider>
-  );
+  return <CampusExchangeApp />;
 }

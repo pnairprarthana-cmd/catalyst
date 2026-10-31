@@ -30,13 +30,13 @@ export default function BottomNav({ onOpenAddModal }: { onOpenAddModal?: () => v
               key={nav.id}
               onClick={() => setActiveTab(nav.id)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-semibold rounded-xl transition-colors cursor-pointer ${
-                isActive ? "text-teal-700" : "text-slate-500 hover:text-slate-700"
+                isActive ? "text-pink-700" : "text-slate-500 hover:text-slate-700"
               }`}
             >
-              <div className={`relative ${isActive ? "text-teal-600" : ""}`}>
+              <div className={`relative ${isActive ? "text-pink-600" : ""}`}>
                 <Icon className="h-5 w-5" />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-teal-500" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-pink-500" />
                 )}
               </div>
               <span>{nav.label}</span>
@@ -47,12 +47,12 @@ export default function BottomNav({ onOpenAddModal }: { onOpenAddModal?: () => v
         {/* Center FAB */}
         <button
           onClick={onOpenAddModal}
-          className="flex flex-col items-center gap-0.5 -mt-4"
+          className="flex flex-col items-center gap-0.5 -mt-4 cursor-pointer"
         >
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0f766e] shadow-lg shadow-teal-500/30 hover:bg-teal-700 transition-colors">
-            <Plus className="h-5 w-5 text-white" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#fde047] border border-[#fef08a] shadow-lg shadow-amber-300/40 hover:bg-[#facc15] transition-colors">
+            <Plus className="h-5 w-5 text-[#78350f]" />
           </div>
-          <span className="text-[10px] font-semibold text-teal-700">Post</span>
+          <span className="text-[10px] font-bold text-[#78350f]">Post</span>
         </button>
 
         {NAVS.slice(2).map((nav) => {
@@ -64,18 +64,18 @@ export default function BottomNav({ onOpenAddModal }: { onOpenAddModal?: () => v
               key={nav.id}
               onClick={() => setActiveTab(nav.id)}
               className={`flex flex-col items-center gap-0.5 px-3 py-1.5 text-[10px] font-semibold rounded-xl transition-colors cursor-pointer ${
-                isActive ? "text-teal-700" : "text-slate-500 hover:text-slate-700"
+                isActive ? "text-pink-700" : "text-slate-500 hover:text-slate-700"
               }`}
             >
-              <div className={`relative ${isActive ? "text-teal-600" : ""}`}>
+              <div className={`relative ${isActive ? "text-pink-600" : ""}`}>
                 <Icon className="h-5 w-5" />
                 {badge && (
-                  <span className="absolute -top-1 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-teal-500 text-[9px] font-bold text-white">
+                  <span className="absolute -top-1 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-[#fde047] border border-[#fef08a] text-[9px] font-bold text-[#78350f]">
                     {badge}
                   </span>
                 )}
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-teal-500" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-pink-500" />
                 )}
               </div>
               <span>{nav.label}</span>

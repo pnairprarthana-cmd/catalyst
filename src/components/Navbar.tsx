@@ -27,7 +27,12 @@ import {
   TrendingUp,
   Settings,
   Check,
+  ShoppingCart,
+  PenTool,
+  Sparkles,
+  Wallet,
 } from "lucide-react";
+import CartDrawer from "@/components/CartDrawer";
 import { CATEGORIES, CAMPUS_STATS } from "@/lib/mockData";
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -36,6 +41,8 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   "cat-3": FlaskConical,
   "cat-4": Cpu,
   "cat-5": Shirt,
+  "cat-10": PenTool,
+  "cat-11": Sparkles,
   "cat-6": Dumbbell,
   "cat-7": Home,
   "cat-8": Wrench,
@@ -44,11 +51,13 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 
 const TOP_CATS = [
   { id: null, label: "All", icon: LayoutGrid },
+  { id: "cat-5", label: "Clothing", icon: Shirt },
+  { id: "cat-10", label: "Stationery", icon: PenTool },
+  { id: "cat-11", label: "Handmade & Hampers", icon: Sparkles },
   { id: "cat-1", label: "Notes & Study", icon: BookOpen },
   { id: "cat-2", label: "Textbooks", icon: BookOpen },
   { id: "cat-3", label: "Lab Gear", icon: FlaskConical },
   { id: "cat-4", label: "Electronics", icon: Cpu },
-  { id: "cat-5", label: "Clothing", icon: Shirt },
   { id: "cat-6", label: "Sports", icon: Dumbbell },
   { id: "cat-7", label: "Hostel Essentials", icon: Home },
   { id: "cat-8", label: "Project Tools", icon: Wrench },
@@ -70,6 +79,9 @@ export default function Navbar({ onOpenAddModal }: { onOpenAddModal: () => void 
     setTransactionFilter,
     openAuthModal,
     logoutStudent,
+    cartItems,
+    setIsCartOpen,
+    availableEarnings,
   } = useCampus();
 
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -113,12 +125,12 @@ export default function Navbar({ onOpenAddModal }: { onOpenAddModal: () => void 
           onClick={() => { setActiveTab("home"); setSelectedCategory(null); }}
           className="flex items-center gap-2 shrink-0 cursor-pointer group"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0f766e] shadow-sm group-hover:bg-[#0d6460] transition-colors">
-            <Leaf className="h-4.5 w-4.5 text-white" style={{ width: 18, height: 18 }} />
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-400 via-rose-400 to-amber-300 shadow-sm group-hover:scale-105 transition-all">
+            <Leaf className="h-5 w-5 text-yellow-100" />
           </div>
           <div className="hidden sm:block">
-            <span className="text-base font-800 text-slate-900 font-extrabold leading-none">
-              Campus<span className="text-[#0f766e]">Exchange</span>
+            <span className="font-display text-xl font-black text-slate-900 tracking-tight leading-none">
+              Campus<span className="text-pink-600">Exchange</span>
             </span>
           </div>
         </button>
@@ -211,6 +223,35 @@ export default function Navbar({ onOpenAddModal }: { onOpenAddModal: () => void 
             )}
           </div>
 
+          {/* Earnings & Wallet Button */}
+          <button
+            onClick={() => setActiveTab("earnings")}
+            title="View My Earnings & Wallet"
+            aria-label="View My Earnings and Wallet"
+            className="flex items-center gap-1.5 rounded-full border border-pink-200 bg-gradient-to-r from-[#FFFBEB] to-[#FCE7F3] px-2.5 sm:px-3 py-1.5 hover:border-pink-300 hover:shadow-xs transition-all cursor-pointer text-xs font-bold text-slate-800"
+          >
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-200 text-amber-900">
+              <Wallet className="h-3 w-3" />
+            </div>
+            <span className="hidden sm:inline text-slate-600 font-medium">Earned:</span>
+            <span className="text-emerald-700 font-extrabold">₹{availableEarnings.toLocaleString("en-IN")}</span>
+          </button>
+
+          {/* Cart Drawer Trigger */}
+          <button
+            onClick={() => setIsCartOpen(true)}
+            title="View Cart & Items"
+            aria-label="View Cart"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <ShoppingCart className="h-4 w-4 text-slate-700" />
+            {cartItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 px-1 items-center justify-center rounded-full bg-[#f08804] text-[10px] font-bold text-white shadow-xs">
+                {cartItems.length}
+              </span>
+            )}
+          </button>
+
           {/* Profile avatar */}
           <div className="relative" ref={userMenuRef}>
             <button
@@ -251,6 +292,7 @@ export default function Navbar({ onOpenAddModal }: { onOpenAddModal: () => void 
                 {/* Nav links */}
                 <div className="py-1">
                   {[
+                    { label: "My Earnings & Wallet", icon: Wallet, tab: "earnings" },
                     { label: "My Listings", icon: Package, tab: "explore" },
                     { label: "Borrowed Items", icon: BookOpen, tab: "rentals" },
                     { label: "Saved Items", icon: Leaf, tab: "explore" },
@@ -318,7 +360,7 @@ export default function Navbar({ onOpenAddModal }: { onOpenAddModal: () => void 
       </div>
 
       {/* ── Category pill bar ── */}
-      <div className="border-t border-slate-100">
+      <div className="border-t border-pink-100/70 bg-[#fff5f7]/40">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-none py-2.5">
             {TOP_CATS.map((cat) => {
@@ -338,6 +380,9 @@ export default function Navbar({ onOpenAddModal }: { onOpenAddModal: () => void 
           </div>
         </div>
       </div>
+
+      {/* Cart Drawer */}
+      <CartDrawer />
     </header>
   );
 }

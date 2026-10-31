@@ -10,67 +10,66 @@ import {
   Leaf,
   ShieldCheck,
   HelpCircle,
-  Users,
   MapPin,
-  TrendingUp,
+  Sparkles,
+  ArrowRight,
   UserCheck,
-  Star,
-  ArrowUpRight,
+  Wallet,
+  Award,
 } from "lucide-react";
 import { CAMPUS_STATS } from "@/lib/mockData";
 
+// Simplified, student-friendly navigation sections
 const NAV_SECTIONS = [
   {
-    title: "Discover",
+    title: "Store & Marketplace",
     items: [
-      { id: "home", label: "Home Feed", icon: Home },
-      { id: "explore", label: "Marketplace", icon: Compass },
-      { id: "requests", label: "Need It? Post It!", icon: HelpCircle },
+      { id: "home", label: "Home", icon: Home },
+      { id: "explore", label: "Campus Store", icon: Compass },
+      { id: "requests", label: "Student Requests", icon: HelpCircle },
     ],
   },
   {
     title: "My Activity",
     items: [
-      { id: "rentals", label: "Rentals & Borrows", icon: CalendarCheck2 },
-      { id: "group-rentals", label: "Group Rentals", icon: Users },
-      { id: "exchange", label: "Smart Exchange", icon: TrendingUp },
-      { id: "giveback", label: "Giveback Corner", icon: Gift },
+      { id: "earnings", label: "My Earnings & Wallet", icon: Wallet },
+      { id: "rentals", label: "My Borrows & Rentals", icon: CalendarCheck2 },
+      { id: "pickups", label: "Campus Pickup Spots", icon: MapPin },
     ],
   },
   {
-    title: "Campus",
+    title: "Community & Eco",
     items: [
-      { id: "pickups", label: "Pickup Hubs", icon: MapPin },
-      { id: "greenscore", label: "GreenScore", icon: Leaf },
-      { id: "passport", label: "Trust Passport", icon: ShieldCheck },
-      { id: "events", label: "Campus Events", icon: Star },
+      { id: "greenscore", label: "Eco Impact & Points", icon: Leaf },
+      { id: "karma-guidelines", label: "Karma & Eco Policy", icon: Award },
+      { id: "passport", label: "Verified Student ID", icon: ShieldCheck },
     ],
   },
 ];
 
 export default function Sidebar() {
-  const { activeTab, setActiveTab, currentUser, rentals, setTransactionFilter } = useCampus();
+  const { activeTab, setActiveTab, currentUser, rentals, setTransactionFilter, availableEarnings } = useCampus();
 
   const activeRentalsCount = rentals.filter(
     (r) => r.status === "active" || r.status === "confirmed"
   ).length;
 
   return (
-    <aside className="ce-sidebar hidden lg:flex w-56 flex-col shrink-0 min-h-[calc(100vh-7rem)]">
+    <aside className="ce-sidebar hidden lg:flex w-56 flex-col shrink-0 min-h-[calc(100vh-7rem)] border-r border-pink-100 bg-white">
       <div className="flex flex-col gap-1 p-3 flex-1 overflow-y-auto">
         {NAV_SECTIONS.map((section) => (
-          <div key={section.title} className="mb-1">
-            <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+          <div key={section.title} className="mb-3">
+            <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
               {section.title}
             </p>
             {section.items.map((item) => {
               const Icon = item.icon;
-              const isActive =
-                activeTab === item.id ||
-                (item.id === "explore" && activeTab === "explore");
+              const isActive = activeTab === item.id;
               const badge =
                 item.id === "rentals" && activeRentalsCount > 0
                   ? String(activeRentalsCount)
+                  : item.id === "earnings"
+                  ? `₹${availableEarnings.toLocaleString("en-IN")}`
                   : null;
 
               return (
@@ -82,25 +81,22 @@ export default function Sidebar() {
                   }}
                   className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-[13px] font-medium transition-all cursor-pointer group ${
                     isActive
-                      ? "bg-teal-50 text-teal-700 font-semibold"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                      ? "bg-pink-50 text-pink-700 font-semibold border-r-2 border-pink-500"
+                      : "text-slate-600 hover:bg-pink-50/50 hover:text-slate-900"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     <Icon
                       className={`h-4 w-4 ${
-                        isActive ? "text-teal-600" : "text-slate-400 group-hover:text-slate-600"
+                        isActive ? "text-pink-600" : "text-slate-400 group-hover:text-pink-500"
                       }`}
                     />
                     <span>{item.label}</span>
                   </div>
                   {badge && (
-                    <span className="flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-teal-500 px-1 text-[10px] font-bold text-white">
+                    <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#fde047] border border-[#fef08a] px-1 text-[11px] font-bold text-[#78350f]">
                       {badge}
                     </span>
-                  )}
-                  {isActive && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-teal-500 ml-auto" />
                   )}
                 </button>
               );
@@ -108,72 +104,55 @@ export default function Sidebar() {
           </div>
         ))}
 
+        {/* Admin Link if Admin */}
         {currentUser.role === "admin" && (
-          <div className="mb-1">
-            <p className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-              Admin
-            </p>
+          <div className="pt-2 border-t border-slate-100">
             <button
               onClick={() => setActiveTab("admin")}
-              className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-all cursor-pointer ${
+              className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-all ${
                 activeTab === "admin"
                   ? "bg-amber-50 text-amber-700 font-semibold"
                   : "text-slate-600 hover:bg-slate-100"
               }`}
             >
               <UserCheck className="h-4 w-4 text-amber-500" />
-              Admin Panel
-              <span className="ml-auto text-[10px] font-bold bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded-full">
-                Admin
-              </span>
+              <span>Campus Admin</span>
             </button>
           </div>
         )}
       </div>
 
-      {/* Campus impact mini card */}
-      <div className="p-3 pb-4">
-        <div className="rounded-xl bg-gradient-to-br from-teal-50 to-emerald-50 border border-teal-100 p-3">
+      {/* Simple Campus Impact Card */}
+      <div className="p-3 border-t border-pink-100 bg-pink-50/30">
+        <div className="rounded-xl border border-pink-200/80 bg-white p-3 shadow-xs">
           <div className="flex items-center gap-1.5 mb-2">
-            <Leaf className="h-3.5 w-3.5 text-teal-600" />
-            <span className="text-[11px] font-bold text-teal-700">Campus Impact</span>
+            <Leaf className="h-3.5 w-3.5 text-pink-600" />
+            <span className="text-[11px] font-bold text-pink-900">Campus Impact</span>
           </div>
-          <div className="space-y-1">
-            <div className="flex justify-between text-[11px]">
-              <span className="text-slate-500">CO₂ Avoided</span>
-              <span className="font-bold text-teal-700">{CAMPUS_STATS.co2AvoidedKg} kg</span>
+          <div className="grid grid-cols-2 gap-2 text-center text-xs">
+            <div className="bg-pink-50 p-1.5 rounded-lg border border-pink-100">
+              <p className="font-extrabold text-pink-700">{CAMPUS_STATS.totalItemsReused}+</p>
+              <p className="text-[10px] text-slate-500">Items Shared</p>
             </div>
-            <div className="flex justify-between text-[11px]">
-              <span className="text-slate-500">Items Shared</span>
-              <span className="font-bold text-slate-700">{CAMPUS_STATS.totalItemsReused}+</span>
-            </div>
-            <div className="flex justify-between text-[11px]">
-              <span className="text-slate-500">Students</span>
-              <span className="font-bold text-slate-700">{CAMPUS_STATS.activeStudents}</span>
+            <div className="bg-yellow-50 p-1.5 rounded-lg border border-yellow-200/60">
+              <p className="font-extrabold text-amber-800">{CAMPUS_STATS.studentMoneySaved}</p>
+              <p className="text-[10px] text-slate-500">Saved</p>
             </div>
           </div>
-          <button
-            onClick={() => setActiveTab("greenscore")}
-            className="mt-2.5 flex w-full items-center justify-center gap-1 rounded-lg bg-teal-600 py-1.5 text-[11px] font-bold text-white hover:bg-teal-700 transition-colors"
-          >
-            View GreenScore <ArrowUpRight className="h-3 w-3" />
-          </button>
         </div>
 
-        {/* User compact profile */}
-        <div className="mt-3 flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2.5">
+        {/* Compact User Info */}
+        <div className="mt-2.5 flex items-center gap-2 p-1.5">
           <img
             src={currentUser.avatar}
             alt={currentUser.name}
-            className="h-8 w-8 rounded-full object-cover ring-2 ring-teal-200"
+            className="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200"
           />
-          <div className="min-w-0">
-            <p className="text-[12px] font-bold text-slate-900 truncate">{currentUser.name.split(" ")[0]}</p>
-            <p className="text-[10px] text-slate-500 truncate">{currentUser.greenScore} pts • {currentUser.trustScore}% Trust</p>
+          <div className="min-w-0 flex-1">
+            <p className="text-[12px] font-semibold text-slate-800 truncate">{currentUser.name}</p>
+            <p className="text-[10px] text-slate-400 truncate">Verified Student</p>
           </div>
-          {currentUser.isVerified && (
-            <ShieldCheck className="h-3.5 w-3.5 text-teal-500 ml-auto shrink-0" />
-          )}
+          <ShieldCheck className="h-3.5 w-3.5 text-teal-500 shrink-0" />
         </div>
       </div>
     </aside>

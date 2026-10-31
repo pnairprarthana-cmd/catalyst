@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useCampus } from "@/context/CampusContext";
 import { ECO_LEADERBOARD, CAMPUS_STATS } from "@/lib/mockData";
+import KarmaGuidelinesView from "@/components/KarmaGuidelinesView";
 import {
   Leaf,
   Trophy,
@@ -15,11 +16,13 @@ import {
   Sparkles,
   CheckCircle2,
   TreeDeciduous,
+  BookOpen,
 } from "lucide-react";
 
 export default function GreenScoreView() {
   const { currentUser, ecoActions } = useCampus();
   const [leaderboardTab, setLeaderboardTab] = useState<"weekly" | "monthly" | "hostel">("weekly");
+  const [showGuidelines, setShowGuidelines] = useState(false);
 
   const tier =
     currentUser.greenScore > 600
@@ -35,7 +38,7 @@ export default function GreenScoreView() {
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/60 via-[#0B132B] to-[#111D4A] p-6 lg:p-8">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
+          <div className="space-y-3 max-w-xl">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-300 border border-emerald-500/30">
               <Leaf className="h-3.5 w-3.5" />
               <span>Campus Circular Sustainability Platform</span>
@@ -47,6 +50,16 @@ export default function GreenScoreView() {
               Every verified textbook reuse, peer equipment rental, and donation diverts measurable CO2
               and electronic waste from university landfills. Earn rewards, unlock campus badges, and compete on the leaderboard.
             </p>
+
+            <div className="pt-1 flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => setShowGuidelines(true)}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 text-slate-950 font-bold px-4 py-2 text-xs shadow-sm transition-all cursor-pointer active:scale-98"
+              >
+                <Award className="h-4 w-4 text-slate-900" />
+                <span>Karma & Eco-Credits Guidelines</span>
+              </button>
+            </div>
           </div>
 
           {/* User Score Gauge */}
@@ -116,7 +129,7 @@ export default function GreenScoreView() {
             </div>
           </div>
           <div className="text-xl sm:text-2xl font-extrabold text-white">
-            ${currentUser.completedTransactions * 22}
+            ₹{currentUser.completedTransactions * 220}
           </div>
           <p className="text-[10px] text-slate-400 mt-1">Saved within campus community</p>
         </div>
@@ -313,9 +326,27 @@ export default function GreenScoreView() {
                 </div>
               </div>
             </div>
+
+            <div className="mt-4 pt-3 border-t border-emerald-500/20">
+              <button
+                onClick={() => setShowGuidelines(true)}
+                className="w-full flex items-center justify-between rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 px-3.5 py-2.5 text-xs font-bold text-emerald-200 transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <Award className="h-4 w-4 text-emerald-400" />
+                  <span>Karma Points & Guardrails Policy</span>
+                </span>
+                <span className="text-emerald-400">→</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Modal Dialog */}
+      {showGuidelines && (
+        <KarmaGuidelinesView isModal onClose={() => setShowGuidelines(false)} />
+      )}
     </div>
   );
 }

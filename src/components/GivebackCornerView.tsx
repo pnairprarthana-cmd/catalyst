@@ -130,7 +130,7 @@ export default function GivebackCornerView({ onOpenAddModal }: { onOpenAddModal:
                       onClick={() => setSelectedListingForClaim(item)}
                       className="rounded-xl bg-emerald-500 px-3 py-1.5 text-xs font-bold text-black shadow-md shadow-emerald-500/20 hover:bg-emerald-400 transition-all cursor-pointer"
                     >
-                      Claim Free ($0)
+                      Claim Free (₹0)
                     </button>
                   </div>
                 </div>
@@ -192,7 +192,7 @@ export default function GivebackCornerView({ onOpenAddModal }: { onOpenAddModal:
                 </div>
 
                 <div className="rounded-xl bg-emerald-950/30 p-2.5 text-[11px] text-emerald-300 border border-emerald-500/20">
-                  Total price: <strong>$0.00 (Free)</strong>. You will earn +40 Eco-Credits on collection.
+                  Total price: <strong>₹0.00 (Free)</strong>. You will earn +40 Eco-Credits on collection.
                 </div>
 
                 <button

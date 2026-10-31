@@ -28,7 +28,7 @@ export default function AdminDashboardView() {
   } = useCampus();
 
   const [auditLog, setAuditLog] = useState<string[]>([
-    "Admin Miller approved student verification for APX-2024-BIO108 (Priya Sharma)",
+    "Admin Miller approved student verification for IITB-2024-BIO108 (Priya Sharma)",
     "Audit: Flagged item ID 'list-9' marked safe after manual review",
     "Central Library Safe Desk A scanner calibrated successfully",
   ]);
@@ -40,7 +40,7 @@ export default function AdminDashboardView() {
       email: "daniel.rivera@campus.edu",
       course: "B.Tech Electrical & Electronics",
       semester: 4,
-      studentId: "APX-2024-EE044",
+      studentId: "IITB-2024-EE044",
       domain: "campus.edu",
       appliedAt: "1 hour ago",
     },
@@ -50,7 +50,7 @@ export default function AdminDashboardView() {
       email: "amina.mansoor@campus.edu",
       course: "B.Des Product & Industrial Design",
       semester: 2,
-      studentId: "APX-2025-DES12",
+      studentId: "IITB-2025-DES12",
       domain: "campus.edu",
       appliedAt: "3 hours ago",
     },

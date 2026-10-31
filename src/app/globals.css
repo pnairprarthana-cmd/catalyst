@@ -1,50 +1,51 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
 
 :root {
-  /* Backgrounds */
-  --bg-page: #f8fafc;
+  /* Backgrounds: Light Pink & Butter Yellow Theme */
+  --bg-page: #fff5f7;            /* Soft light pink blush */
   --bg-card: #ffffff;
-  --bg-header: rgba(255, 255, 255, 0.96);
-  --bg-input: #f1f5f9;
-  --bg-pill: #f1f5f9;
-  --bg-pill-active: #0f766e;
+  --bg-header: rgba(255, 255, 255, 0.95);
+  --bg-input: #fffdf5;           /* Warm creamy butter input background */
+  --bg-pill: #fff1f2;            /* Light pink pill */
+  --bg-pill-active: #fde047;     /* Butter yellow active pill */
 
-  /* Borders */
-  --border-subtle: #e2e8f0;
-  --border-card: #e8edf3;
-  --border-input: #d1d9e0;
-  --border-focus: #0f766e;
+  /* Borders: Light Pink & Soft Butter Accents */
+  --border-subtle: #fce7f3;      /* Soft light pink border */
+  --border-card: #fce7f3;        /* Soft blush card border */
+  --border-input: #fbcfe8;       /* Light pink input border */
+  --border-focus: #f472b6;       /* Rose pink focus */
 
-  /* Brand Colors — Teal/Green collegiate */
-  --brand-primary: #0f766e;
-  --brand-primary-hover: #0d6460;
-  --brand-primary-light: #f0fdf9;
-  --brand-secondary: #14b8a6;
-  --brand-accent: #10b981;
+  /* Brand Colors — Light Pink & Butter Yellow */
+  --brand-primary: #fde047;      /* Butter Yellow */
+  --brand-primary-hover: #facc15;/* Rich Butter Yellow Hover */
+  --brand-primary-light: #fef9c3;/* Creamy Butter Light */
+  --brand-primary-text: #78350f; /* Warm Amber Dark Contrast Text */
+  --brand-secondary: #f472b6;    /* Soft Pink Accent */
+  --brand-accent: #fb7185;       /* Warm Coral Rose */
+  --brand-pink-dark: #be185d;    /* Deep Berry Pink for text links */
 
   /* Text */
-  --text-heading: #0f172a;
+  --text-heading: #1e293b;
   --text-body: #334155;
   --text-muted: #64748b;
   --text-placeholder: #94a3b8;
-  --text-on-brand: #ffffff;
+  --text-on-brand: #78350f;
 
-  /* Status */
-  --status-free: #059669;
-  --status-free-bg: #ecfdf5;
-  --status-rent: #0369a1;
-  --status-rent-bg: #eff6ff;
-  --status-sell: #7c3aed;
-  --status-sell-bg: #f5f3ff;
-  --status-giveaway: #b45309;
-  --status-giveaway-bg: #fffbeb;
+  /* Status Badges */
+  --status-free: #854d0e;
+  --status-free-bg: #fef9c3;     /* Butter yellow */
+  --status-rent: #be185d;
+  --status-rent-bg: #fdf2f8;     /* Light pink */
+  --status-sell: #9a3412;
+  --status-sell-bg: #ffedd5;
+  --status-giveaway: #c026d3;
+  --status-giveaway-bg: #fae8ff;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.15);
-  --shadow-header: 0 1px 0 #e2e8f0;
+  --shadow-card: 0 1px 3px rgba(244, 114, 182, 0.08), 0 1px 2px rgba(253, 224, 71, 0.06);
+  --shadow-card-hover: 0 6px 16px rgba(244, 114, 182, 0.12), 0 2px 6px rgba(253, 224, 71, 0.1);
+  --shadow-modal: 0 20px 60px rgba(190, 24, 93, 0.16);
+  --shadow-header: 0 1px 0 #fce7f3;
 }
 
 * {
@@ -65,6 +66,11 @@ body {
   line-height: 1.5;
 }
 
+.font-display {
+  font-family: var(--font-display), "Outfit", "Inter", sans-serif;
+  letter-spacing: -0.02em;
+}
+
 /* ── Scrollbar ─────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg-page); }
@@ -72,7 +78,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* ── Selection ─────────────────────────────────── */
-::selection { background: #ccfbf1; color: #0f766e; }
+::selection { background: #fef08a; color: #854d0e; }
 
 /* ── Hide scrollbar ────────────────────────────── */
 .scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
@@ -89,22 +95,26 @@ body {
 .ce-card:hover {
   box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
-  border-color: #c7d8d6;
+  border-color: #fbcfe8;
 }
 
-/* ── Product Card Image ────────────────────────── */
+/* ── Product Card Image (Amazon Style) ─────────── */
 .ce-card-image {
   overflow: hidden;
-  border-radius: 12px 12px 0 0;
-  aspect-ratio: 4/3;
+  border-radius: 6px;
+  height: 220px;
   position: relative;
-  background: #f1f5f9;
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
 }
 .ce-card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s ease;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.25s ease;
 }
 .ce-card:hover .ce-card-image img {
   transform: scale(1.04);
@@ -127,14 +137,16 @@ body {
   white-space: nowrap;
 }
 .ce-pill:hover {
-  border-color: var(--brand-secondary);
-  color: var(--brand-primary);
-  background: var(--brand-primary-light);
+  border-color: #f472b6;
+  color: #be185d;
+  background: #fff1f2;
 }
 .ce-pill.active {
-  border-color: var(--brand-primary);
-  background: var(--brand-primary);
-  color: #ffffff;
+  border-color: #f59e0b;
+  background: #fde047;
+  color: #78350f;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
 }
 
 /* ── Search Bar ────────────────────────────────── */
@@ -148,8 +160,8 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .ce-search:focus-within {
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  border-color: #f472b6;
+  box-shadow: 0 0 0 3px rgba(254, 240, 138, 0.7);
 }
 .ce-search input {
   flex: 1;
@@ -172,13 +184,14 @@ body {
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 700;
-  background: var(--brand-primary);
-  color: #ffffff;
-  border: none;
+  background: #fde047;
+  color: #78350f;
+  border: 1px solid #facc15;
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 1px 2px rgba(245, 158, 11, 0.15);
+  transition: all 0.15s ease;
 }
-.ce-btn-primary:hover { background: var(--brand-primary-hover); transform: translateY(-1px); }
+.ce-btn-primary:hover { background: #facc15; color: #713f12; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25); }
 .ce-btn-primary:active { transform: translateY(0); }
 
 .ce-btn-outline {
@@ -190,16 +203,16 @@ body {
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 600;
-  background: transparent;
-  color: var(--text-body);
-  border: 1.5px solid var(--border-input);
+  background: #ffffff;
+  color: #334155;
+  border: 1.5px solid #fbcfe8;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 .ce-btn-outline:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background: var(--brand-primary-light);
+  border-color: #f472b6;
+  color: #be185d;
+  background: #fff1f2;
 }
 
 /* ── Tag Badges ────────────────────────────────── */
@@ -323,8 +336,8 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .ce-input:focus {
-  border-color: var(--brand-primary);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+  border-color: #f472b6;
+  box-shadow: 0 0 0 3px rgba(254, 240, 138, 0.6);
 }
 .ce-input::placeholder { color: var(--text-placeholder); }
 
@@ -414,25 +427,22 @@ body {
   background: var(--bg-pill);
 }
 .ce-filter-tab.active {
-  background: var(--brand-primary);
-  color: #fff;
-  border-color: var(--brand-primary);
+  background: #fde047;
+  color: #78350f;
+  border-color: #facc15;
+  font-weight: 700;
 }
 
-/* ── Responsive grid helpers ───────────────────── */
+/* ── Amazon-style Responsive Marketplace Grid ── */
 .marketplace-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
 }
-@media (min-width: 480px) {
-  .marketplace-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 768px) {
-  .marketplace-grid { grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-}
-@media (min-width: 1200px) {
-  .marketplace-grid { grid-template-columns: repeat(4, 1fr); }
+@media (min-width: 1024px) {
+  .marketplace-grid {
+    gap: 20px;
+  }
 }
 
 /* ── Divider ───────────────────────────────────── */
@@ -503,6 +513,20 @@ body {
   to { transform: translateY(0); }
 }
 .slide-up { animation: slide-up 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards; }
+
+/* ── Marquee Animation ──────────────────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
 
 /* ── View-specific overrides ───────────────────── */
 .light-view {

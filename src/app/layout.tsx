@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import { CampusProvider } from "@/context/CampusContext";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
+const outfit = Outfit({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -32,11 +40,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${inter.variable} min-h-screen bg-[#f8fafc] text-slate-800 antialiased`}
+        className={`${inter.variable} ${outfit.variable} min-h-screen bg-[#fff5f7] text-slate-800 antialiased`}
         style={{ fontFamily: "var(--font-inter), Inter, sans-serif" }}
       >
-        {children}
+        <CampusProvider>
+          {children}
+        </CampusProvider>
       </body>
     </html>
   );
 }
+

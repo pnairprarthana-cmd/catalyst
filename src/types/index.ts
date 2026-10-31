@@ -237,3 +237,19 @@ export interface Testimonial {
   rating: number;
 }
 
+export interface EarningsTransaction {
+  id: string;
+  userId: string;
+  title: string;
+  type: "store_sale" | "rental_income" | "craft_order" | "escrow_cleared" | "withdrawal";
+  amount: number; // in Rupees
+  date: string;
+  status: "credited" | "pending_escrow" | "withdrawn" | "processing";
+  buyerOrRenterName?: string;
+  buyerAvatar?: string;
+  paymentMethod: "UPI Instant" | "Campus Safe Desk" | "Direct Bank";
+  referenceCode: string;
+  category?: string;
+}
+
+
